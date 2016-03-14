@@ -23,7 +23,7 @@ namespace CodemastersBinImage
             }
         }
 
-        public BinImageData(Bitmap image, Bitmap mask)
+        public BinImageData(Bitmap image)
         {
             byte[] tiles;
             ushort[] mapping;
@@ -31,9 +31,8 @@ namespace CodemastersBinImage
             ushort width;
             ushort height;
 
-            VideoSega.ImageToData(image, mask, out tiles, out mapping, out palette, out width, out height);
+            VideoSega.ImageToDataNoMask(image, out tiles, out mapping, out palette, out width, out height);
             image.Dispose();
-            mask.Dispose();
 
             MemoryStream dataStream = new MemoryStream();
             dataStream.WriteWordInc(0, (ushort)(tiles.Length / TileSize));

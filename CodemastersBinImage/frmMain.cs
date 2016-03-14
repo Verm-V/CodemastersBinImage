@@ -102,7 +102,7 @@ namespace CodemastersBinImage
 
             image.Save(imageName, ImageFormat.Bmp);
             MessageBox.Show(string.Format("{0}{1}File: \"{2}\".",
-                "File successfully converted to bitmap and mask!",
+                "File successfully converted to bitmap!",
                 Environment.NewLine,
                 Path.GetFileName(imageName)
                 ), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -127,12 +127,7 @@ namespace CodemastersBinImage
             if (dlgOpenBmp.ShowDialog() != DialogResult.OK) return;
             string imageFile = dlgOpenBmp.FileName;
 
-            dlgOpenBmp.Title = "Select your image Mask...";
-            dlgOpenBmp.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}_mask.bmp", index, offset)));
-            if (dlgOpenBmp.ShowDialog() != DialogResult.OK) return;
-            string maskFile = dlgOpenBmp.FileName;
-
-            BinImageData bid = new BinImageData((Bitmap.FromFile(imageFile) as Bitmap), (Bitmap.FromFile(maskFile) as Bitmap));
+            BinImageData bid = new BinImageData((Bitmap.FromFile(imageFile) as Bitmap));
 
             if (bid == null) return;
 
