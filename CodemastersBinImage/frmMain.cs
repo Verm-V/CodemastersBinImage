@@ -134,7 +134,7 @@ namespace CodemastersBinImage
                 }
 
                 Array.Copy(data, 0, rom, offset, data.Length);
-                File.WriteAllBytes(tbPath.Text, data);
+                File.WriteAllBytes(tbPath.Text, rom);
 
                 MessageBox.Show("File successfully imploded and inserted into ROM!",
                     "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
