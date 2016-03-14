@@ -111,6 +111,7 @@ namespace CodemastersBinImage
 
             int index = lvItems.SelectedIndices[0];
             int offset = itemsList[index].Item1;
+            int size = itemsList[index].Item2;
 
             dlgOpenBmp.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}.bmp", index, offset)));
             if (dlgOpenBmp.ShowDialog() != DialogResult.OK) return;
@@ -123,14 +124,34 @@ namespace CodemastersBinImage
             if (bmp == null) return;
             bmp.Dispose();
 
-            string fileName = Path.ChangeExtension(dlgOpenBmp.FileName, ".imp.bin");
-            File.WriteAllBytes(fileName, bid.Data);
+            byte[] data = bid.Data;
 
-            MessageBox.Show(string.Format("{0}{1}File: \"{2}\".",
-                "File successfully converted to binary data!",
-                Environment.NewLine,
-                Path.GetFileName(fileName)
-                ), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (data.Length <= size)
+            {
+                for (int i = 0; i < size; ++i)
+                {
+                    rom[offset + i] = 0x00; // clearing space
+                }
+
+                Array.Copy(data, 0, rom, offset, data.Length);
+                File.WriteAllBytes(tbPath.Text, data);
+
+                MessageBox.Show("File successfully imploded and inserted into ROM!",
+                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                string fileName = Path.ChangeExtension(dlgOpenBmp.FileName, ".imp.bin");
+                File.WriteAllBytes(fileName, bid.Data);
+
+                MessageBox.Show(string.Format("{0}{4}{1}{4}{2}{4}File: \"{4}\".",
+                    "Size of imploded data is greater then original one!",
+                    "Saving in external file...",
+                    "File successfully converted to binary data!",
+                    Path.GetFileName(fileName),
+                    Environment.NewLine
+                    ), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void lvItems_SelectedIndexChanged(object sender, System.EventArgs e)

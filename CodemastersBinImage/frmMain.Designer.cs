@@ -52,9 +52,9 @@
             // 
             this.pbImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pbImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbImage.Location = new System.Drawing.Point(349, 0);
+            this.pbImage.Location = new System.Drawing.Point(347, 0);
             this.pbImage.Name = "pbImage";
-            this.pbImage.Size = new System.Drawing.Size(351, 387);
+            this.pbImage.Size = new System.Drawing.Size(327, 387);
             this.pbImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pbImage.TabIndex = 2;
             this.pbImage.TabStop = false;
@@ -85,7 +85,7 @@
             this.pnlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlLeft.Location = new System.Drawing.Point(0, 0);
             this.pnlLeft.Name = "pnlLeft";
-            this.pnlLeft.Size = new System.Drawing.Size(349, 387);
+            this.pnlLeft.Size = new System.Drawing.Size(347, 387);
             this.pnlLeft.TabIndex = 7;
             // 
             // lvItems
@@ -102,7 +102,7 @@
             this.lvItems.Location = new System.Drawing.Point(0, 82);
             this.lvItems.MultiSelect = false;
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(349, 305);
+            this.lvItems.Size = new System.Drawing.Size(347, 305);
             this.lvItems.TabIndex = 6;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
@@ -135,7 +135,7 @@
             this.pnlButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlButtons.Location = new System.Drawing.Point(0, 0);
             this.pnlButtons.Name = "pnlButtons";
-            this.pnlButtons.Size = new System.Drawing.Size(349, 82);
+            this.pnlButtons.Size = new System.Drawing.Size(347, 82);
             this.pnlButtons.TabIndex = 7;
             // 
             // btnImplode
@@ -188,12 +188,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 387);
+            this.ClientSize = new System.Drawing.Size(674, 387);
             this.Controls.Add(this.pbImage);
             this.Controls.Add(this.pnlLeft);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
