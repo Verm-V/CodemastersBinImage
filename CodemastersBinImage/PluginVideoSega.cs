@@ -386,20 +386,14 @@ namespace PluginVideoSega
 
         public static Color[] PaletteFromImage(Bitmap image)
         {
-            List<Color> colors = new List<Color>();
+            Color[] colors = new Color[16];
 
-            for (int i = 0; i < image.Palette.Entries.Length; ++i)
+            for (int i = 0; i < Math.Min(colors.Length, image.Palette.Entries.Length); ++i)
             {
-                colors.Add(image.Palette.Entries[i]);
+                colors[i] = ColorApplySega(image.Palette.Entries[i]);
             }
 
-            colors = colors.Distinct().ToList();
-
-            Color[] retn = new Color[16];
-            for (int i = 0; i < Math.Min(colors.Count, retn.Length); ++i)
-                retn[i] = ColorApplySega(colors[i]);
-
-            return retn;
+            return colors;
         }
 
         public static ushort GetVramWriteAddr(uint value)
