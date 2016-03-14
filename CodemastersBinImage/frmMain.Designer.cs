@@ -53,9 +53,9 @@
             this.pbImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pbImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pbImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbImage.Location = new System.Drawing.Point(341, 0);
+            this.pbImage.Location = new System.Drawing.Point(293, 0);
             this.pbImage.Name = "pbImage";
-            this.pbImage.Size = new System.Drawing.Size(512, 387);
+            this.pbImage.Size = new System.Drawing.Size(516, 387);
             this.pbImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pbImage.TabIndex = 2;
             this.pbImage.TabStop = false;
@@ -86,7 +86,7 @@
             this.pnlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlLeft.Location = new System.Drawing.Point(0, 0);
             this.pnlLeft.Name = "pnlLeft";
-            this.pnlLeft.Size = new System.Drawing.Size(341, 387);
+            this.pnlLeft.Size = new System.Drawing.Size(293, 387);
             this.pnlLeft.TabIndex = 7;
             // 
             // lvItems
@@ -103,7 +103,7 @@
             this.lvItems.Location = new System.Drawing.Point(0, 76);
             this.lvItems.MultiSelect = false;
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(341, 311);
+            this.lvItems.Size = new System.Drawing.Size(293, 311);
             this.lvItems.TabIndex = 6;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
@@ -136,7 +136,7 @@
             this.pnlButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlButtons.Location = new System.Drawing.Point(0, 0);
             this.pnlButtons.Name = "pnlButtons";
-            this.pnlButtons.Size = new System.Drawing.Size(341, 76);
+            this.pnlButtons.Size = new System.Drawing.Size(293, 76);
             this.pnlButtons.TabIndex = 7;
             // 
             // btnImplode
@@ -145,7 +145,7 @@
             this.btnImplode.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.btnImplode.Enabled = false;
             this.btnImplode.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnImplode.Location = new System.Drawing.Point(219, 38);
+            this.btnImplode.Location = new System.Drawing.Point(170, 38);
             this.btnImplode.Name = "btnImplode";
             this.btnImplode.Size = new System.Drawing.Size(115, 25);
             this.btnImplode.TabIndex = 6;
@@ -161,9 +161,9 @@
             this.btnExport.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnExport.Location = new System.Drawing.Point(56, 38);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(157, 25);
+            this.btnExport.Size = new System.Drawing.Size(108, 25);
             this.btnExport.TabIndex = 5;
-            this.btnExport.Text = "Export Bitmap && Mask";
+            this.btnExport.Text = "Export Bitmap";
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
@@ -186,7 +186,7 @@
             this.tbPath.Location = new System.Drawing.Point(12, 12);
             this.tbPath.Name = "tbPath";
             this.tbPath.ReadOnly = true;
-            this.tbPath.Size = new System.Drawing.Size(322, 20);
+            this.tbPath.Size = new System.Drawing.Size(273, 20);
             this.tbPath.TabIndex = 1;
             this.tbPath.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tbPath.WordWrap = false;
@@ -195,7 +195,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(853, 387);
+            this.ClientSize = new System.Drawing.Size(809, 387);
             this.Controls.Add(this.pbImage);
             this.Controls.Add(this.pnlLeft);
             this.DoubleBuffered = true;

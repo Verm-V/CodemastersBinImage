@@ -240,10 +240,9 @@ namespace CodemastersBinImage
             }
         }
 
-        public void ImageAndMask(out Bitmap image, out Bitmap mask)
+        public void ImageAndMask(out Bitmap image)
         {
             image = VideoSega.ImageFromData(Tiles, Mapping, Palette, Width, Height);
-            mask = VideoSega.ImageMaskFromData(Mapping, Width, Height);
         }
     }
 }

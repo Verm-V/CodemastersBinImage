@@ -129,8 +129,8 @@ namespace PluginVideoSega
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
 
             byte pal = 0;
-            for (ushort y = 0; y < height; y += 8)
-                for (ushort x = 0; x < width; x += 8)
+            for (ushort y = 0; y < height; ++y)
+                for (ushort x = 0; x < width; ++x)
                 {
                     ushort word = mapping[y * width + x];
                     bool prior = Mapper.P(word);
@@ -139,7 +139,7 @@ namespace PluginVideoSega
                     for (int h = 0; h < 8; h++)
                         for (int w = 0; w < 8; w++)
                         {
-                            bytes[(y + h) * data.Stride + (x + w)] = (byte)(prior ? 1 : 0);
+                            bytes[(y * 8 + h) * data.Stride + (x * 8 + w)] = (byte)(prior ? 1 : 0);
                         }
                 }
 
@@ -204,7 +204,7 @@ namespace PluginVideoSega
             for (int y = 0; y < height; y += 8)
                 for (int x = 0; x < width; x += 8)
                 {
-                    int idx = (y * width) / 8 + (x % 8);
+                    int idx = (y / 8) * (width / 8) + (x / 8);
 
                     Rectangle rect = new Rectangle(new Point(x, y), new Size(8, 8));
                     Bitmap tile = Helpers.CropImage(image, rect);
@@ -262,7 +262,7 @@ namespace PluginVideoSega
                         for (int h = 0; h < 8; h++)
                             for (int w = 0; w < 8; w++)
                             {
-                                 if (maskBytes[(y + h) * maskData.Stride + (x + w)] == 1)
+                                 if (maskBytes[(y * 8 + h) * maskData.Stride + (x * 8 + w)] == 1)
                                 {
                                     prior = true;
                                     break;
