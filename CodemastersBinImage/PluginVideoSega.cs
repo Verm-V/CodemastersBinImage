@@ -91,7 +91,6 @@ namespace PluginVideoSega
         {
             ushort tilePos = Mapper.TilePos(word);
             for (int h = 0; h < 8; h++)
-            {
                 for (int w = 0; w < 4; w++)
                 {
                     if (tilePos >= tiles.Length) return false;
@@ -105,9 +104,53 @@ namespace PluginVideoSega
                     bytes[newH * data.Stride + newW1] = (byte)((B & 0xF0) >> 4);
                     bytes[newH * data.Stride + newW2] = (byte)((B & 0x0F) >> 0);
                 }
-            }
 
             return true;
+        }
+
+        public static Bitmap ImageMaskFromData(ushort[] mapping, ushort width, ushort height)
+        {
+            if (mapping == null) return null;
+            if (width == 0) return null;
+            if (height == 0) return null;
+
+            Bitmap mask = new Bitmap(width * 8, height * 8, PixelFormat.Format8bppIndexed);
+
+            ColorPalette maskPal = mask.Palette;
+
+            for (int i = 0; i < maskPal.Entries.Length; ++i)
+            {
+                maskPal.Entries[i] = VideoSega.ColorApplySega(Color.White); // Clear palette
+            }
+
+            BitmapData data = mask.LockBits(new Rectangle(0, 0, mask.Width, mask.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+
+            byte[] bytes = new byte[data.Height * data.Stride];
+            Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+
+            byte pal = 0;
+            for (ushort y = 0; y < height; y += 8)
+                for (ushort x = 0; x < width; x += 8)
+                {
+                    ushort word = mapping[y * width + x];
+                    bool prior = Mapper.P(word);
+                    pal = Mapper.PalIdx(word);
+
+                    for (int h = 0; h < 8; h++)
+                        for (int w = 0; w < 8; w++)
+                        {
+                            bytes[(y + h) * data.Stride + (x + w)] = (byte)(prior ? 1 : 0);
+                        }
+                }
+
+            maskPal.Entries[1] = Color.FromArgb((pal << 4), 0, 0); // First color for non prior
+            mask.Palette = maskPal;
+
+            Marshal.Copy(bytes, 0, data.Scan0, bytes.Length);
+
+            mask.UnlockBits(data);
+
+            return mask;
         }
 
         public static Bitmap ImageFromData(byte[] tiles, ushort[] mapping, Color[] palette, ushort width, ushort height)
@@ -120,17 +163,17 @@ namespace PluginVideoSega
 
             Bitmap image = new Bitmap(width * 8, height * 8, PixelFormat.Format8bppIndexed);
 
-            ColorPalette colorPalette = image.Palette;
+            ColorPalette imagePal = image.Palette;
 
-            for (int i = 0; i < colorPalette.Entries.Length; ++i)
+            for (int i = 0; i < imagePal.Entries.Length; ++i)
             {
-                colorPalette.Entries[i] = Color.Black;
+                imagePal.Entries[i] = VideoSega.ColorApplySega(Color.Black); // Clear palette
             }
             for (int i = 0; i < palette.Length; ++i)
             {
-                colorPalette.Entries[i] = palette[i];
+                imagePal.Entries[i] = palette[i]; // Fill image palette
             }
-            image.Palette = colorPalette;
+            image.Palette = imagePal;
 
             BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
 
@@ -138,17 +181,10 @@ namespace PluginVideoSega
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
 
             for (ushort y = 0; y < height; ++y)
-            {
                 for (ushort x = 0; x < width; ++x)
                 {
-                    ushort word = mapping[y * width + x];
-                    byte palIndex = Mapper.PalIdx(word);
-                    bool HF = Mapper.HF(word);
-                    bool VF = Mapper.VF(word);
-
-                    if (!TileFromData(bytes, data, x * 8, y * 8, tiles, word, palette)) return null;
+                    if (!TileFromData(bytes, data, x * 8, y * 8, tiles, mapping[y * width + x], palette)) return null;
                 }
-            }
 
             Marshal.Copy(bytes, 0, data.Scan0, bytes.Length);
 
@@ -157,21 +193,20 @@ namespace PluginVideoSega
             return image;
         }
 
-        public static void ImageToData(Bitmap image, ushort tileWidth, ushort tileHeight, out byte[] tiles, out ushort[] mapping, out Color[] palette, out ushort width, out ushort height)
+        public static void ImageToData(Bitmap image, Bitmap mask, out byte[] tiles, out ushort[] mapping, out Color[] palette, out ushort width, out ushort height)
         {
             width = (ushort)image.Width;
             height = (ushort)image.Height;
 
-            List<Tuple<byte[], int>> hashes = new List<Tuple<byte[], int>>();
-            List<Tuple<byte[][], int>> hashesAll = new List<Tuple<byte[][], int>>();
+            List<Tuple<byte[], int>> tilesAllHF = new List<Tuple<byte[], int>>();
+            List<Tuple<byte[][], int>> tilesAll = new List<Tuple<byte[][], int>>();
 
-            int idx = 0;
-            for (int y = 0; y < height; y += tileHeight)
-                for (int x = 0; x < width; x += tileWidth)
+            for (int y = 0; y < height; y += 8)
+                for (int x = 0; x < width; x += 8)
                 {
-                    idx++;
+                    int idx = (y * width) / 8 + (x % 8);
 
-                    Rectangle rect = new Rectangle(new Point(x, y), new Size(tileWidth, tileHeight));
+                    Rectangle rect = new Rectangle(new Point(x, y), new Size(8, 8));
                     Bitmap tile = Helpers.CropImage(image, rect);
 
                     byte[] hash00 = Helpers.BitmapToArray(tile); // !HF, !VF
@@ -182,23 +217,31 @@ namespace PluginVideoSega
                     tile.RotateFlip(RotateFlipType.RotateNoneFlipX);
                     byte[] hash01 = Helpers.BitmapToArray(tile); // !HF,  VF
 
-                    hashesAll.Add(new Tuple<byte[][], int>(new byte[][] { hash00, hash10, hash11, hash01 }, idx));
+                    tilesAll.Add(new Tuple<byte[][], int>(new byte[][] { hash00, hash10, hash11, hash01 }, idx));
 
-                    hashes.Add(new Tuple<byte[], int>(hash00, idx));
-                    hashes.Add(new Tuple<byte[], int>(hash10, idx));
-                    hashes.Add(new Tuple<byte[], int>(hash11, idx));
-                    hashes.Add(new Tuple<byte[], int>(hash01, idx));
+                    tilesAllHF.Add(new Tuple<byte[], int>(hash00, idx));
+                    tilesAllHF.Add(new Tuple<byte[], int>(hash10, idx));
+                    tilesAllHF.Add(new Tuple<byte[], int>(hash11, idx));
+                    tilesAllHF.Add(new Tuple<byte[], int>(hash01, idx));
                 }
 
-            hashes = hashes.Distinct(new Helpers.CompareKey()).ToList(); //remove tile duplicates
-            hashes = hashes.Distinct(new Helpers.CompareValue()).ToList(); //remove tile duplicates
+            tilesAllHF = tilesAllHF.Distinct(new Helpers.CompareKey()).ToList(); //remove tile duplicates
+            tilesAllHF = tilesAllHF.Distinct(new Helpers.CompareValue()).ToList(); //remove tile duplicates
+
+            BitmapData maskData = mask.LockBits(new Rectangle(0, 0, mask.Width, mask.Height), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
+
+            byte[] maskBytes = new byte[maskData.Height * maskData.Stride];
+            Marshal.Copy(maskData.Scan0, maskBytes, 0, maskBytes.Length);
 
             MemoryStream stream = new MemoryStream();
-            for (int i = 0; i < hashesAll.Count; ++i)
+            for (int i = 0; i < tilesAll.Count; ++i)
             {
-                for (int l = 0; l < hashesAll[i].Item1.Length; ++l)
-                {
-                    if ((idx = hashes.FindIndex(a => Helpers.CompareByteArray.Compare(a.Item1, hashesAll[i].Item1[l]))) >= 0)
+                int x = (i % (width / 8));
+                int y = (i / (width / 8));
+
+                int idx = 0;
+                for (int l = 0; l < tilesAll[i].Item1.Length; ++l)
+                    if ((idx = tilesAllHF.FindIndex(a => Helpers.CompareByteArray.Compare(a.Item1, tilesAll[i].Item1[l]))) >= 0)
                     {
                         ushort word = 0;
                         bool HF = false, VF = false; // !HF, !VF
@@ -215,12 +258,24 @@ namespace PluginVideoSega
                                 break;
                         }
 
-                        word = Mapper.EncodeTileInfo((ushort)idx, HF, VF, 0);
+                        bool prior = false;
+                        for (int h = 0; h < 8; h++)
+                            for (int w = 0; w < 8; w++)
+                            {
+                                 if (maskBytes[(y + h) * maskData.Stride + (x + w)] == 1)
+                                {
+                                    prior = true;
+                                    break;
+                                }
+                            }
+
+                        word = Mapper.EncodeTileInfo((ushort)idx, HF, VF, (byte)(mask.Palette.Entries[1].R >> 4), prior);
                         stream.WriteWordInc(0, word);
                         break;
                     }
-                }
             }
+
+            mask.UnlockBits(maskData);
 
             width /= 8;
             height /= 8;
@@ -230,10 +285,10 @@ namespace PluginVideoSega
 
             MemoryStream tilesStream = new MemoryStream();
 
-            int tilesCount = hashes.Count;
+            int tilesCount = tilesAllHF.Count;
             for (int x = 0; x < tilesCount; x++)
             {
-                Bitmap tile = Helpers.BitmapFromArray(hashes[x].Item1);
+                Bitmap tile = Helpers.BitmapFromArray(tilesAllHF[x].Item1);
 
                 byte[] tileBytes;
                 TileToData(tile, out tileBytes, palette);
@@ -327,13 +382,12 @@ namespace PluginVideoSega
         {
             ushort idx = TileIdx(Word);
             ushort tilesPos = (ushort)(idx * 0x20);
-            //if (idx >= 0x1F0 && idx <= 0x1FF) tilesPos += 0x200;
             return tilesPos;
         }
 
-        public static ushort EncodeTileInfo(ushort idx, bool hf, bool vf, byte PalIndex)
+        public static ushort EncodeTileInfo(ushort idx, bool hf, bool vf, byte palIndex, bool p)
         {
-            int retn = ((PalIndex & 3) << 13) | ((vf ? 1 : 0) << 12) | ((hf ? 1 : 0) << 11) | (idx & 0x7FF);
+            int retn = ((p ? 1 : 0) << 15) | ((palIndex & 3) << 13) | ((vf ? 1 : 0) << 12) | ((hf ? 1 : 0) << 11) | (idx & 0x7FF);
             return (ushort)retn;
         }
 

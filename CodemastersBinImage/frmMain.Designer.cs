@@ -40,7 +40,7 @@
             this.chSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pnlButtons = new System.Windows.Forms.Panel();
             this.btnImplode = new System.Windows.Forms.Button();
-            this.btnExportBitmap = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.tbPath = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbImage)).BeginInit();
@@ -50,11 +50,12 @@
             // 
             // pbImage
             // 
+            this.pbImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pbImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pbImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbImage.Location = new System.Drawing.Point(347, 0);
+            this.pbImage.Location = new System.Drawing.Point(341, 0);
             this.pbImage.Name = "pbImage";
-            this.pbImage.Size = new System.Drawing.Size(327, 387);
+            this.pbImage.Size = new System.Drawing.Size(512, 387);
             this.pbImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pbImage.TabIndex = 2;
             this.pbImage.TabStop = false;
@@ -85,7 +86,7 @@
             this.pnlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlLeft.Location = new System.Drawing.Point(0, 0);
             this.pnlLeft.Name = "pnlLeft";
-            this.pnlLeft.Size = new System.Drawing.Size(347, 387);
+            this.pnlLeft.Size = new System.Drawing.Size(341, 387);
             this.pnlLeft.TabIndex = 7;
             // 
             // lvItems
@@ -99,10 +100,10 @@
             this.lvItems.FullRowSelect = true;
             this.lvItems.GridLines = true;
             this.lvItems.HideSelection = false;
-            this.lvItems.Location = new System.Drawing.Point(0, 82);
+            this.lvItems.Location = new System.Drawing.Point(0, 76);
             this.lvItems.MultiSelect = false;
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(347, 305);
+            this.lvItems.Size = new System.Drawing.Size(341, 311);
             this.lvItems.TabIndex = 6;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
@@ -129,66 +130,72 @@
             // pnlButtons
             // 
             this.pnlButtons.Controls.Add(this.btnImplode);
-            this.pnlButtons.Controls.Add(this.btnExportBitmap);
+            this.pnlButtons.Controls.Add(this.btnExport);
             this.pnlButtons.Controls.Add(this.btnBrowse);
             this.pnlButtons.Controls.Add(this.tbPath);
             this.pnlButtons.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlButtons.Location = new System.Drawing.Point(0, 0);
             this.pnlButtons.Name = "pnlButtons";
-            this.pnlButtons.Size = new System.Drawing.Size(347, 82);
+            this.pnlButtons.Size = new System.Drawing.Size(341, 76);
             this.pnlButtons.TabIndex = 7;
             // 
             // btnImplode
             // 
             this.btnImplode.AutoSize = true;
+            this.btnImplode.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnImplode.Enabled = false;
             this.btnImplode.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnImplode.Location = new System.Drawing.Point(108, 41);
+            this.btnImplode.Location = new System.Drawing.Point(219, 38);
             this.btnImplode.Name = "btnImplode";
-            this.btnImplode.Size = new System.Drawing.Size(115, 27);
+            this.btnImplode.Size = new System.Drawing.Size(115, 25);
             this.btnImplode.TabIndex = 6;
             this.btnImplode.Text = "Implode Bitmap";
             this.btnImplode.UseVisualStyleBackColor = true;
             this.btnImplode.Click += new System.EventHandler(this.btnImplode_Click);
             // 
-            // btnExportBitmap
+            // btnExport
             // 
-            this.btnExportBitmap.AutoSize = true;
-            this.btnExportBitmap.Enabled = false;
-            this.btnExportBitmap.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnExportBitmap.Location = new System.Drawing.Point(229, 41);
-            this.btnExportBitmap.Name = "btnExportBitmap";
-            this.btnExportBitmap.Size = new System.Drawing.Size(108, 27);
-            this.btnExportBitmap.TabIndex = 5;
-            this.btnExportBitmap.Text = "Export Bitmap";
-            this.btnExportBitmap.UseVisualStyleBackColor = true;
-            this.btnExportBitmap.Click += new System.EventHandler(this.btnExport_Click);
+            this.btnExport.AutoSize = true;
+            this.btnExport.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnExport.Enabled = false;
+            this.btnExport.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnExport.Location = new System.Drawing.Point(56, 38);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(157, 25);
+            this.btnExport.TabIndex = 5;
+            this.btnExport.Text = "Export Bitmap && Mask";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // btnBrowse
             // 
             this.btnBrowse.AutoSize = true;
+            this.btnBrowse.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.btnBrowse.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnBrowse.Location = new System.Drawing.Point(14, 41);
+            this.btnBrowse.Location = new System.Drawing.Point(12, 38);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(88, 27);
+            this.btnBrowse.Size = new System.Drawing.Size(38, 25);
             this.btnBrowse.TabIndex = 2;
-            this.btnBrowse.Text = "Browse";
+            this.btnBrowse.Text = "...";
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // tbPath
             // 
             this.tbPath.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tbPath.Location = new System.Drawing.Point(14, 15);
+            this.tbPath.Location = new System.Drawing.Point(12, 12);
             this.tbPath.Name = "tbPath";
             this.tbPath.ReadOnly = true;
-            this.tbPath.Size = new System.Drawing.Size(323, 20);
+            this.tbPath.Size = new System.Drawing.Size(322, 20);
             this.tbPath.TabIndex = 1;
+            this.tbPath.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbPath.WordWrap = false;
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(674, 387);
+            this.ClientSize = new System.Drawing.Size(853, 387);
             this.Controls.Add(this.pbImage);
             this.Controls.Add(this.pnlLeft);
             this.DoubleBuffered = true;
@@ -218,7 +225,7 @@
         private System.Windows.Forms.ColumnHeader chSize;
         private System.Windows.Forms.Panel pnlButtons;
         private System.Windows.Forms.Button btnImplode;
-        private System.Windows.Forms.Button btnExportBitmap;
+        private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.TextBox tbPath;
     }

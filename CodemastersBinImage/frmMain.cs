@@ -51,13 +51,18 @@ namespace CodemastersBinImage
 
                 BinImageData bid = new BinImageData(data);
 
-                Bitmap bmp = bid.Image;
-                if (bmp == null)
+                Bitmap image;
+                Bitmap mask;
+                bid.ImageAndMask(out image, out mask);
+
+                if (image == null)
                 {
                     itemsList.Remove(pair);
                     continue;
                 }
-                bmp.Dispose();
+
+                image.Dispose();
+                mask.Dispose();
 
                 string[] row = { i.ToString(), offset.ToString("X6"), size.ToString("X4") };
                 var lvItem = new ListViewItem(row);
@@ -85,22 +90,37 @@ namespace CodemastersBinImage
 
             dlgSave.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}.bmp", index, offset)));
             if (dlgSave.ShowDialog() != DialogResult.OK) return;
+            string imageName = dlgSave.FileName;
+
+            dlgSave.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}_mask.bmp", index, offset)));
+            if (dlgSave.ShowDialog() != DialogResult.OK) return;
+            string maskName = dlgSave.FileName;
 
             byte[] data = new byte[size];
             Array.Copy(rom, offset, data, 0, size);
 
             BinImageData bid = new BinImageData(data);
-            Bitmap bmp = bid.Image;
 
-            if (bmp == null) return;
+            Bitmap image;
+            Bitmap mask;
+            bid.ImageAndMask(out image, out mask);
 
-            bmp.Save(dlgSave.FileName, ImageFormat.Bmp);
-            MessageBox.Show(string.Format("{0}{1}File: \"{2}\".",
-                "File successfully converted to bitmap!",
+            if (image == null) return;
+            if (mask == null) return;
+
+            image.Save(imageName, ImageFormat.Bmp);
+            mask.Save(maskName, ImageFormat.Bmp);
+            MessageBox.Show(string.Format("{0}{1}{1}Files:{1}\"{2}\".{1}\"{3}\".",
+                "File successfully converted to bitmap and mask!",
                 Environment.NewLine,
-                Path.GetFileName(dlgSave.FileName)
+                Path.GetFileName(imageName),
+                Path.GetFileName(maskName)
                 ), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            bmp.Dispose();
+
+            image.Dispose();
+            mask.Dispose();
+
+            lvItems.Select();
         }
 
         private void btnImplode_Click(object sender, System.EventArgs e)
@@ -115,14 +135,24 @@ namespace CodemastersBinImage
 
             dlgOpenBmp.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}.bmp", index, offset)));
             if (dlgOpenBmp.ShowDialog() != DialogResult.OK) return;
+            string imageFile = dlgOpenBmp.FileName;
 
-            BinImageData bid = BinImageData.FromFile(dlgOpenBmp.FileName);
+            dlgOpenBmp.FileName = Path.GetFileName(Path.ChangeExtension(tbPath.Text, string.Format(".{0:000}_{1:X6}_mask.bmp", index, offset)));
+            if (dlgOpenBmp.ShowDialog() != DialogResult.OK) return;
+            string maskFile = dlgOpenBmp.FileName;
+
+            BinImageData bid = new BinImageData((Bitmap.FromFile(imageFile) as Bitmap), (Bitmap.FromFile(maskFile) as Bitmap));
 
             if (bid == null) return;
-            Bitmap bmp = bid.Image;
 
-            if (bmp == null) return;
-            bmp.Dispose();
+            Bitmap image;
+            Bitmap mask;
+            bid.ImageAndMask(out image, out mask);
+
+            if (image == null) return;
+            image.Dispose();
+            if (mask == null) return;
+            mask.Dispose();
 
             byte[] data = bid.Data;
 
@@ -152,6 +182,8 @@ namespace CodemastersBinImage
                     Environment.NewLine
                     ), "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            lvItems.Select();
         }
 
         private void lvItems_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -160,7 +192,8 @@ namespace CodemastersBinImage
             if (rom == null) return;
             if (itemsList == null) return;
 
-            btnExportBitmap.Enabled = false;
+            btnImplode.Enabled = false;
+            btnExport.Enabled = false;
 
             int index = lvItems.SelectedIndices[0];
             int offset = itemsList[index].Item1;
@@ -171,13 +204,21 @@ namespace CodemastersBinImage
 
             BinImageData bid = new BinImageData(data);
 
-            Bitmap bmp = bid.Image;
+            Bitmap image;
+            Bitmap mask;
+            bid.ImageAndMask(out image, out mask);
 
-            if (bmp != null)
+            if (image == null) return;
+            if (mask == null) return;
+
+            if (image != null)
             {
-                pbImage.Image = bmp;
+                pbImage.Image = image;
 
-                btnExportBitmap.Enabled = true;
+                btnImplode.Enabled = true;
+                btnExport.Enabled = true;
+
+                mask.Dispose();
             }
         }
 

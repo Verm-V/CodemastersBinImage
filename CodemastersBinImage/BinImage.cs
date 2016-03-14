@@ -11,34 +11,6 @@ namespace CodemastersBinImage
     {
         byte[] data = null;
 
-        public static BinImageData FromFile(string fileName)
-        {
-            if (!File.Exists(fileName)) return null;
-
-            bool isBitmap;
-            Bitmap image = null;
-            try
-            {
-                image = (Bitmap.FromFile(fileName) as Bitmap);
-                isBitmap = (image != null);
-            }
-            catch
-            {
-                isBitmap = false;
-            }
-
-            if (isBitmap)
-            {
-                return new BinImageData(image);
-            }
-            else
-            {
-                byte[] bytes = File.ReadAllBytes(fileName);
-
-                return new BinImageData(bytes);
-            }
-        }
-
         public BinImageData(byte[] data)
         {
             if (ImploderWork.CheckImp(data))
@@ -51,7 +23,7 @@ namespace CodemastersBinImage
             }
         }
 
-        public BinImageData(Bitmap image)
+        public BinImageData(Bitmap image, Bitmap mask)
         {
             byte[] tiles;
             ushort[] mapping;
@@ -59,8 +31,9 @@ namespace CodemastersBinImage
             ushort width;
             ushort height;
 
-            VideoSega.ImageToData(image, 8, 8, out tiles, out mapping, out palette, out width, out height);
+            VideoSega.ImageToData(image, mask, out tiles, out mapping, out palette, out width, out height);
             image.Dispose();
+            mask.Dispose();
 
             MemoryStream dataStream = new MemoryStream();
             dataStream.WriteWordInc(0, (ushort)(tiles.Length / TileSize));
@@ -267,14 +240,10 @@ namespace CodemastersBinImage
             }
         }
 
-        public Bitmap Image
+        public void ImageAndMask(out Bitmap image, out Bitmap mask)
         {
-            get
-            {
-                if (TilesCount == 0 || MappingSize == 0) return null;
-
-                return VideoSega.ImageFromData(Tiles, Mapping, Palette, Width, Height);
-            }
+            image = VideoSega.ImageFromData(Tiles, Mapping, Palette, Width, Height);
+            mask = VideoSega.ImageMaskFromData(Mapping, Width, Height);
         }
     }
 }
