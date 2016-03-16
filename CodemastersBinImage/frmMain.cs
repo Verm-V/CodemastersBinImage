@@ -61,7 +61,7 @@ namespace CodemastersBinImage
 
                 image.Dispose();
 
-                string[] row = { (i + 1).ToString("0:000"), string.Format("0x{0:X6}", offset), string.Format("0x{0:X4} ({0:00000})", size)};
+                string[] row = { string.Format("{0:000}", i + 1), string.Format("0x{0:X6}", offset), string.Format("0x{0:X4} ({0:00000})", size)};
                 var lvItem = new ListViewItem(row);
                 lvItems.Items.Add(lvItem);
 
