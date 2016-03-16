@@ -118,13 +118,7 @@ namespace Helper
 
         public static Bitmap CropImage(Bitmap source, Rectangle cropArea)
         {
-            var croppedImage = new Bitmap(cropArea.Width, cropArea.Height, PixelFormat.Format32bppPArgb);
-            using (var gr = Graphics.FromImage(croppedImage))
-            {
-                gr.DrawImage(source, new Rectangle(0, 0, cropArea.Width, cropArea.Height),
-                    cropArea, GraphicsUnit.Pixel);
-            }
-            return croppedImage;
+            return source.Clone(cropArea, source.PixelFormat);
         }
 
         public static byte[] BitmapToArray(Bitmap image)

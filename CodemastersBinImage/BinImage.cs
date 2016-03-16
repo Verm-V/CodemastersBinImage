@@ -31,7 +31,7 @@ namespace CodemastersBinImage
             ushort width;
             ushort height;
 
-            VideoSega.ImageToDataNoMask(image, out tiles, out mapping, out palette, out width, out height);
+            VideoSega.ImageToData(image, null, out tiles, out mapping, out palette, out width, out height);
             image.Dispose();
 
             MemoryStream dataStream = new MemoryStream();
