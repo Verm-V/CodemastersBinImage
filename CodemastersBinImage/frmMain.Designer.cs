@@ -64,7 +64,7 @@
             // 
             // dlgOpen
             // 
-            this.dlgOpen.Filter = "ROM Files (*.bin)|*.bin|All Files (*.*)|*.*";
+            this.dlgOpen.Filter = "ROM Files (*.bin;*.gen)|*.bin;*.gen|All Files (*.*)|*.*";
             this.dlgOpen.RestoreDirectory = true;
             this.dlgOpen.Title = "Select the game ROM...";
             // 

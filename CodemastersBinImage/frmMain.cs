@@ -198,11 +198,11 @@ namespace CodemastersBinImage
             }
             else
             {
-                string fileName = Path.ChangeExtension(dlgOpenBmp.FileName, ".imp.bin");
+                string fileName = Path.ChangeExtension(imageFile, ".imp.bin");
                 File.WriteAllBytes(fileName, bid.Data);
 
-                MessageBox.Show(string.Format("{0}{4}{1}{4}{2}{4}File: \"{4}\".",
-                    "Size of imploded data is greater then original one!",
+                MessageBox.Show(string.Format("{0}{4}{1}{4}{2}{4}File: \"{3}\".",
+                    string.Format("Size of imploded data exceeds original one by +{0} bytes!", data.Length - size),
                     "Saving in external file...",
                     "File successfully converted to binary data!",
                     Path.GetFileName(fileName),

@@ -116,7 +116,7 @@ namespace PluginVideoSega
 
             for (int i = 0; i < maskPal.Entries.Length; ++i)
             {
-                maskPal.Entries[i] = VideoSega.ColorApplySega(Color.White); // Clear palette
+                maskPal.Entries[i] = ColorApplySega(Color.White); // Clear palette
             }
 
             BitmapData data = mask.LockBits(new Rectangle(0, 0, mask.Width, mask.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
@@ -156,17 +156,6 @@ namespace PluginVideoSega
             if (height == 0) return null;
 
             Bitmap image = new Bitmap(width * 8, height * 8, PixelFormat.Format8bppIndexed);
-            ColorPalette imagePal = image.Palette;
-
-            for (int i = 0; i < imagePal.Entries.Length; ++i)
-            {
-                imagePal.Entries[i] = VideoSega.ColorApplySega(Color.Black); // Clear palette
-            }
-            for (int i = 0; i < palette.Length; ++i)
-            {
-                imagePal.Entries[i] = palette[i]; // Fill image palette
-            }
-            image.Palette = imagePal;
 
             BitmapData imageData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
             byte[] imageBytes = new byte[imageData.Height * imageData.Stride];
@@ -182,6 +171,8 @@ namespace PluginVideoSega
 
             Marshal.Copy(imageBytes, 0, imageData.Scan0, imageBytes.Length);
             image.UnlockBits(imageData);
+
+            PaletteToImage(image, palette);
 
             return image;
         }
@@ -306,12 +297,31 @@ namespace PluginVideoSega
         {
             Color[] colors = new Color[16];
 
-            for (int i = 0; i < Math.Min(colors.Length, image.Palette.Entries.Length); ++i)
+            for (int i = 0; i < colors.Length; ++i)
             {
                 colors[i] = ColorApplySega(image.Palette.Entries[i]);
             }
 
             return colors;
+        }
+
+        public static void PaletteToImage(Bitmap image, Color[] palette)
+        {
+            ColorPalette imagePal = image.Palette;
+
+            for (int i = 0; i < imagePal.Entries.Length; ++i)
+            {
+                imagePal.Entries[i] = ColorApplySega(Color.Black); // Clear palette
+            }
+            for (int i = 0; i < palette.Length; ++i)
+            {
+                imagePal.Entries[i] = Color.FromArgb(
+                    palette[i].R | ((i & 0x0C) >> 2),
+                    palette[i].G | ((i & 0x02) >> 1),
+                    palette[i].B | ((i & 0x01) >> 0)
+                    ); // Fill image palette
+            }
+            image.Palette = imagePal;
         }
 
         public static ushort GetVramWriteAddr(uint value)
