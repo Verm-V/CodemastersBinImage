@@ -210,6 +210,7 @@
             // 
             // frmMain
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(809, 387);
@@ -222,6 +223,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Codemasters BinImage";
             this.Load += new System.EventHandler(this.frmMain_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.frmMain_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.frmMain_DragEnter);
             ((System.ComponentModel.ISupportInitialize)(this.pbImage)).EndInit();
             this.pnlLeft.ResumeLayout(false);
             this.pnlButtons.ResumeLayout(false);

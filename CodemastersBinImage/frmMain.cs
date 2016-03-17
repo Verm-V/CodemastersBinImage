@@ -19,14 +19,11 @@ namespace CodemastersBinImage
             InitializeComponent();
         }
 
-        private void btnBrowse_Click(object sender, System.EventArgs e)
+        private void LoadFile(string fileName)
         {
-            if (dlgOpen.ShowDialog() != DialogResult.OK) return;
-            if (!File.Exists(dlgOpen.FileName)) return;
-
             btnExportAll.Enabled = false;
 
-            romPath = dlgOpen.FileName;
+            romPath = fileName;
             tbPath.Text = Path.GetFileName(romPath);
 
             lvItems.Items.Clear();
@@ -61,7 +58,7 @@ namespace CodemastersBinImage
 
                 image.Dispose();
 
-                string[] row = { string.Format("{0:000}", i + 1), string.Format("0x{0:X6}", offset), string.Format("0x{0:X4} ({0:00000})", size)};
+                string[] row = { string.Format("{0:000}", i + 1), string.Format("0x{0:X6}", offset), string.Format("0x{0:X4} ({0:00000})", size) };
                 var lvItem = new ListViewItem(row);
                 lvItems.Items.Add(lvItem);
 
@@ -75,6 +72,14 @@ namespace CodemastersBinImage
             lvItems.Items[0].Focused = true;
             lvItems.Items[0].Selected = true;
             lvItems.Select();
+        }
+
+        private void btnBrowse_Click(object sender, System.EventArgs e)
+        {
+            if (dlgOpen.ShowDialog() != DialogResult.OK) return;
+            if (!File.Exists(dlgOpen.FileName)) return;
+
+            LoadFile(dlgOpen.FileName);
         }
 
         private void btnExport_Click(object sender, System.EventArgs e)
@@ -256,6 +261,21 @@ namespace CodemastersBinImage
         private void frmMain_Load(object sender, EventArgs e)
         {
             SizeLastColumn(lvItems);
+        }
+
+        private void frmMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
+            {
+                e.Effect = DragDropEffects.All;
+            }
+        }
+
+        private void frmMain_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])(e.Data.GetData(DataFormats.FileDrop));
+
+            LoadFile(files[0]);
         }
     }
 }
