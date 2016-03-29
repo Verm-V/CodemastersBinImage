@@ -9,7 +9,41 @@ using System.Runtime.InteropServices;
 
 namespace PluginVideoSega
 {
-    public static class VideoSega
+    public class ScreenPoint
+	{
+		byte _X = 0;
+        byte _Y = 0;
+		ushort _PlaneAddr = 0x0000;
+
+        public ScreenPoint() { }
+
+		public ScreenPoint(byte x, byte y, ushort planeAddr)
+        {
+            _X = x;
+            _Y = y;
+			_PlaneAddr = planeAddr;
+        }
+
+        public byte X
+        {
+            get { return _X; }
+            set { _X = value; }
+        }
+
+        public byte Y
+        {
+            get { return _Y; }
+            set { _Y = value; }
+        }
+
+		public ushort PlaneAddr
+		{
+			get { return _PlaneAddr; }
+			set { _PlaneAddr = value; }
+		}
+	}
+	
+	public static class VideoSega
     {
         public static Color[] PaletteFromByteArray(byte[] pal)
         {
@@ -147,23 +181,23 @@ namespace PluginVideoSega
             return mask;
         }
 
-        public static Bitmap ImageFromData(byte[] tiles, ushort[] mapping, Color[] palette, ushort width, ushort height)
+        public static Bitmap ImageFromData(byte[] tiles, ushort[] mapping, Color[] palette, ushort widthInTiles, ushort heightInTiles)
         {
             if (tiles == null) return null;
             if (mapping == null) return null;
             if (palette == null) return null;
-            if (width == 0) return null;
-            if (height == 0) return null;
+            if (widthInTiles == 0) return null;
+            if (heightInTiles == 0) return null;
 
-            Bitmap image = new Bitmap(width * 8, height * 8, PixelFormat.Format8bppIndexed);
+            Bitmap image = new Bitmap(widthInTiles * 8, heightInTiles * 8, PixelFormat.Format8bppIndexed);
 
             BitmapData imageData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
             byte[] imageBytes = new byte[imageData.Height * imageData.Stride];
             Marshal.Copy(imageData.Scan0, imageBytes, 0, imageBytes.Length);
 
-            for (ushort y = 0; y < height; ++y)
-                for (ushort x = 0; x < width; ++x)
-                    if (!TileFromData(imageBytes, imageData, x * 8, y * 8, tiles, mapping[y * width + x]))
+            for (ushort y = 0; y < heightInTiles; ++y)
+                for (ushort x = 0; x < widthInTiles; ++x)
+                    if (!TileFromData(imageBytes, imageData, x * 8, y * 8, tiles, mapping[y * widthInTiles + x]))
                     {
                         image.UnlockBits(imageData);
                         return null;
@@ -293,6 +327,26 @@ namespace PluginVideoSega
             }
         }
 
+        public static Bitmap TilesetFromData(byte[] tiles, Color[] palette, out int tilesCount, ushort tilesInRow = 16)
+        {
+            tilesCount = (tiles != null ? (tiles.Length / 0x20) : 0);
+            tilesInRow = (ushort)((tilesCount < tilesInRow) ? tilesCount : tilesInRow);
+
+            if (tilesCount != 0)
+            {
+                ushort[] mapping = new ushort[tilesCount];
+
+                for (int x = 0; x < tilesCount; x++)
+                {
+                    mapping[x] = Mapper.EncodeTileInfo((ushort)x, false, false, 0, false);
+                }
+
+                return ImageFromData(tiles, mapping, palette, tilesInRow, (ushort)(tilesCount / tilesInRow));
+            }
+
+            return null;
+        }
+
         public static Color[] PaletteFromImage(Bitmap image)
         {
             Color[] colors = new Color[16];
@@ -331,7 +385,26 @@ namespace PluginVideoSega
 
         public static uint SetVramWriteAddr(ushort value)
         {
-            return (uint)(((value >> 14) & Helpers.mask(0, 2)) | ((value << 16) & Helpers.mask(16, 14)));
+            return (uint)(((value >> 14) & Helpers.mask(0, 2)) | ((value << 16) & Helpers.mask(16, 14)) | (1 << 30));
+        }
+
+        public static ScreenPoint VramAddrToScreenPoint(ushort vramAddr, byte screenSize)
+        {
+            ushort planeAddr = (ushort)(vramAddr & 0xE000);
+            vramAddr &= 0x1FFF;
+            vramAddr >>= 1;
+            byte x = (byte)(vramAddr % screenSize);
+            byte y = (byte)(vramAddr / screenSize);
+            return new ScreenPoint(x, y, planeAddr);
+        }
+
+        public static ushort VramAddrFromScreenPoint(ScreenPoint xy, byte screenSize)
+        {
+            ushort vramAddr = (ushort)(xy.Y * screenSize + xy.X);
+            vramAddr <<= 1;
+            vramAddr &= 0x1FFF;
+            vramAddr |= (ushort)(xy.PlaneAddr & 0xE000);
+            return vramAddr;
         }
     }
 
